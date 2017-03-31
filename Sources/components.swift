@@ -1,26 +1,50 @@
 public extension RuString {
-    func components(separatedBy separator: String, limit: Int? = nil) -> [String] {
-        if limit == .some(0) {
-            return []
+    func components(separatedBy separator: String,
+                    limit: Int? = nil,
+                    keepSeparator: Bool = false) -> [String] {
+        return components(separatedBy: [separator],
+                          limit: limit, keepSeparator: keepSeparator)
+    }
+
+    func components(separatedBy separators: [String],
+                    limit: Int? = nil,
+                    keepSeparator: Bool = false) -> [String]
+    {
+        if let limit = limit {
+            precondition(limit > 0, "limit > 0")
         }
 
         let stringChars: String.CharacterView = selfString.characters
-        let separatorChars: String.CharacterView = separator.characters
+        let separatorCharsList: [String.CharacterView] = separators.map { $0.characters }
         var index = stringChars.startIndex
         var charsList: [String.CharacterView] = []
         while true {
-            if let lim = limit {
-                if charsList.count + 1 == lim {
+            if let limit = limit {
+                if charsList.count + 1 == limit {
                     break
                 }
             }
-            if let foundIndex = findSubArray(array: stringChars, index: index, target: separatorChars) {
-                charsList.append(stringChars[index..<foundIndex])
-                index = stringChars.index(foundIndex, offsetBy: separatorChars.count)
-            } else {
+
+            var foundIndexOpt: String.CharacterView.Index? = nil
+            var foundEndIndexOpt: String.CharacterView.Index? = nil
+            for separatorChars in separatorCharsList {
+                if let fi = findSubArray(array: stringChars, index: index, target: separatorChars) {
+                    foundIndexOpt = foundIndexOpt.map { min($0, fi) } ?? fi
+                    foundEndIndexOpt = stringChars.index(foundIndexOpt!, offsetBy: separatorChars.count)
+                }
+            }
+
+            guard let foundIndex = foundIndexOpt,
+                let foundEndIndex = foundEndIndexOpt else {
                 break
             }
+
+            let charsEndIndex = keepSeparator ? foundEndIndex : foundIndex
+            charsList.append(stringChars[index..<charsEndIndex])
+
+            index = foundEndIndex
         }
+
         charsList.append(stringChars[index..<stringChars.endIndex])
         return charsList.map { String($0) }
     }
