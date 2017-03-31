@@ -38,8 +38,9 @@ internal func matchArray<C: Collection>(
 
     let test1 = array1[index1..<array1.index(index1, offsetBy: length)]
     let test2 = array2[index2..<array2.index(index2, offsetBy: length)]
-
+    print("array1 \(array1), index1: \(index1), array2: \(array2), index2: \(index2)")
     for (x1, x2) in zip(test1, test2) {
+        print("test [\(x1)], [\(x2)]")
         if x1 != x2 {
             return false
         }

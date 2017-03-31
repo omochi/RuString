@@ -8,14 +8,14 @@
 
 import Darwin
 
-public extension RuStringStatic {
-    func format(_ format: String, _ args: CVarArg...) -> String {
+public extension RuString {
+    static func format(_ format: String, _ args: CVarArg...) -> String {
         return withVaList(args) {
             self.format(format, arguments: $0)
         }
     }
     
-    func format(_ format: String, arguments: CVaListPointer) -> String {
+    static func format(_ format: String, arguments: CVaListPointer) -> String {
         var bufferp: UnsafeMutablePointer<CChar>? = nil
         let len = Int(Darwin.vasprintf(&bufferp, format, arguments))
         if len < 0 {

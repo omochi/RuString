@@ -10,27 +10,31 @@ public extension RuString {
                     limit: Int? = nil,
                     keepSeparator: Bool = false) -> [String]
     {
+        typealias View = String.UnicodeScalarView
+
         if let limit = limit {
             precondition(limit > 0, "limit > 0")
         }
 
-        let stringChars: String.CharacterView = selfString.characters
-        let separatorCharsList: [String.CharacterView] = separators.map { $0.characters }
-        var index = stringChars.startIndex
-        var charsList: [String.CharacterView] = []
+        let stringView: View = selfString.unicodeScalars
+        let separatorViewList: [View] = separators.map { $0.unicodeScalars }
+        var index = stringView.startIndex
+        var resultViewList: [View] = []
         while true {
             if let limit = limit {
-                if charsList.count + 1 == limit {
+                if resultViewList.count + 1 == limit {
                     break
                 }
             }
 
-            var foundIndexOpt: String.CharacterView.Index? = nil
-            var foundEndIndexOpt: String.CharacterView.Index? = nil
-            for separatorChars in separatorCharsList {
-                if let fi = findSubArray(array: stringChars, index: index, target: separatorChars) {
-                    foundIndexOpt = foundIndexOpt.map { min($0, fi) } ?? fi
-                    foundEndIndexOpt = stringChars.index(foundIndexOpt!, offsetBy: separatorChars.count)
+            var foundIndexOpt: View.Index? = nil
+            var foundEndIndexOpt: View.Index? = nil
+            for separatorChars in separatorViewList {
+                if let fi = findSubArray(array: stringView, index: index, target: separatorChars) {
+                    if foundIndexOpt == nil || fi < foundIndexOpt! {
+                        foundIndexOpt = fi
+                        foundEndIndexOpt = stringView.index(foundIndexOpt!, offsetBy: separatorChars.count)
+                    }
                 }
             }
 
@@ -40,13 +44,13 @@ public extension RuString {
             }
 
             let charsEndIndex = keepSeparator ? foundEndIndex : foundIndex
-            charsList.append(stringChars[index..<charsEndIndex])
+            resultViewList.append(stringView[index..<charsEndIndex])
 
             index = foundEndIndex
         }
 
-        charsList.append(stringChars[index..<stringChars.endIndex])
-        return charsList.map { String($0) }
+        resultViewList.append(stringView[index..<stringView.endIndex])
+        return resultViewList.map { String($0) }
     }
 }
 

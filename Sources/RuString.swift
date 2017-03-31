@@ -19,4 +19,6 @@ public extension String {
     var ru: RuString {
         return RuString(string: self)
     }
+
+    static let ru: RuString.Type = RuString.self
 }

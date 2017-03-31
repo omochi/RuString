@@ -9,9 +9,19 @@ class RuStringTests: XCTestCase {
         XCTAssertEqual(str.ru.components(separatedBy: "123", limit: 2), ["aaa", "bbb123ccc"])
     }
 
+    func testComponents2() {
+        let str = "aaa\r\nbbb"
+        XCTAssertEqual(str.ru.components(separatedBy: ["\n"]), ["aaa\r", "bbb"])
+    }
+
     func testLines() {
         let str = "aaa\nbbb\r\nccc"
         XCTAssertEqual(str.ru.lines(), ["aaa\n", "bbb\r\n", "ccc"])
+    }
+
+    func testStrip() {
+        let str = "\t  aaaa\r\n"
+        XCTAssertEqual(str.ru.strip(), "aaaa")
     }
 
     func testFormat() {
