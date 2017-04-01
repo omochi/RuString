@@ -61,6 +61,7 @@ internal func matchCollection<C: Collection>(
 
     let test1 = collection1[index1..<collection1.index(index1, offsetBy: length)]
     let test2 = collection2[index2..<collection2.index(index2, offsetBy: length)]
+
     for (x1, x2) in zip(test1, test2) {
         if x1 != x2 {
             return false
