@@ -6,41 +6,62 @@
 //
 //
 
-internal func findSubArray<C: Collection>(
-    array: C, index: C.Index, target: C
-) -> C.Index?
-    where C.SubSequence.Iterator.Element : Equatable
+internal func findIndex<C: Collection>(
+    collection: C, startIndex: C.Index,
+    pred: (C, C.Index) -> Bool) -> C.Index?
 {
-    var i = index
-    while i < array.endIndex {
-        if matchArray(array1: array, index1: i,
-                      array2: target, index2: target.startIndex,
-                      length: target.count)
-        {
-            return i
+    var index = startIndex
+    while index < collection.endIndex {
+        if pred(collection, index) {
+            return index
         }
-        i = array.index(after: i)
+        index = collection.index(after: index)
     }
     return nil
 }
 
-internal func matchArray<C: Collection>(
-    array1: C, index1: C.Index,
-    array2: C, index2: C.Index, length: C.IndexDistance) -> Bool
+internal func findIndex<C: Collection>(
+    collection: C, startIndex: C.Index,
+    targets: [C]
+    ) -> (index: C.Index, target: C)?
     where C.SubSequence.Iterator.Element : Equatable
 {
-    if array1.distance(from: index1, to: array1.endIndex) < length {
-        return false
-    }
-    if array2.distance(from: index2, to: array2.endIndex) < length {
+    var result: (index: C.Index, target: C)? = nil
+
+    let _ = findIndex(collection: collection, startIndex: startIndex) { (c, i) in
+        for target in targets {
+            if matchCollection(collection1: c, index1: i, collection2: target) {
+                result = (index: i, target: target)
+                return true
+            }
+        }
         return false
     }
 
-    let test1 = array1[index1..<array1.index(index1, offsetBy: length)]
-    let test2 = array2[index2..<array2.index(index2, offsetBy: length)]
-    print("array1 \(array1), index1: \(index1), array2: \(array2), index2: \(index2)")
+    return result
+}
+
+internal func matchCollection<C: Collection>(
+    collection1: C,
+    index1: C.Index,
+    collection2: C,
+    index2 index2Opt: C.Index? = nil,
+    length lengthOpt: C.IndexDistance? = nil) -> Bool
+    where C.SubSequence.Iterator.Element : Equatable
+{
+    let index2 = index2Opt ?? collection2.startIndex
+    let length = lengthOpt ?? collection2.distance(from: index2, to: collection2.endIndex)
+
+    if collection1.distance(from: index1, to: collection1.endIndex) < length {
+        return false
+    }
+    if collection2.distance(from: index2, to: collection2.endIndex) < length {
+        return false
+    }
+
+    let test1 = collection1[index1..<collection1.index(index1, offsetBy: length)]
+    let test2 = collection2[index2..<collection2.index(index2, offsetBy: length)]
     for (x1, x2) in zip(test1, test2) {
-        print("test [\(x1)], [\(x2)]")
         if x1 != x2 {
             return false
         }

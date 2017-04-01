@@ -27,25 +27,13 @@ public extension RuString {
                 }
             }
 
-            var foundIndexOpt: View.Index? = nil
-            var foundEndIndexOpt: View.Index? = nil
-            for separatorChars in separatorViewList {
-                if let fi = findSubArray(array: stringView, index: index, target: separatorChars) {
-                    if foundIndexOpt == nil || fi < foundIndexOpt! {
-                        foundIndexOpt = fi
-                        foundEndIndexOpt = stringView.index(foundIndexOpt!, offsetBy: separatorChars.count)
-                    }
-                }
-            }
-
-            guard let foundIndex = foundIndexOpt,
-                let foundEndIndex = foundEndIndexOpt else {
+            guard let found = findIndex(collection: stringView, startIndex: index, targets: separatorViewList) else {
                 break
             }
 
-            let charsEndIndex = keepSeparator ? foundEndIndex : foundIndex
+            let foundEndIndex = stringView.index(found.index, offsetBy: found.target.count)
+            let charsEndIndex = keepSeparator ? foundEndIndex : found.index
             resultViewList.append(stringView[index..<charsEndIndex])
-
             index = foundEndIndex
         }
 

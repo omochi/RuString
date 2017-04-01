@@ -20,8 +20,9 @@ public extension RuString {
             var found = false
 
             for removeChars in removeViewList {
-                if matchArray(array1: stringView, index1: newStartIndex,
-                              array2: removeChars, index2: removeChars.startIndex, length: removeChars.count)
+                if matchCollection(collection1: stringView,
+                                   index1: newStartIndex,
+                                   collection2: removeChars)
                 {
                     found = true
                     newStartIndex = stringView.index(newStartIndex, offsetBy: removeChars.count)
@@ -48,16 +49,9 @@ public extension RuString {
             var found = false
 
             for removeChars in removeViewList {
-
-                print("newEndIndex = \(newEndIndex)")
-                print("removeChars = \(removeChars.count)")
-                print("index1 = \(stringView.index(newEndIndex, offsetBy: -removeChars.count))")
-
-                if matchArray(array1: stringView,
-                              index1: stringView.index(newEndIndex, offsetBy: -removeChars.count),
-                              array2: removeChars,
-                              index2: removeChars.startIndex,
-                              length: removeChars.count)
+                if matchCollection(collection1: stringView,
+                                   index1: stringView.index(newEndIndex, offsetBy: -removeChars.count),
+                                   collection2: removeChars)
                 {
                     found = true
                     newEndIndex = stringView.index(newEndIndex, offsetBy: -removeChars.count)
